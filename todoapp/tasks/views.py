@@ -1,10 +1,11 @@
-from django.shortcuts import render,get_object_or_404, redirect, HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404, redirect, HttpResponseRedirect, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from rest_framework import generics, permissions
 from .models import Task
 from .serializers import taskSerializer
 from django.contrib.auth.decorators import login_required
 from .forms import LoginFoms, SingUpForm
+from django.contrib.auth.models import User
 # Create your views here.
 
 class TaskList(generics.ListAPIView):
@@ -34,9 +35,18 @@ class TaskDelete(generics.DestroyAPIView):
 
 
 
+
 #Iniciar sesion
 def user_login(request):
-    if request.method == 'post':
+
+    forms = LoginFoms()
+
+    if request.method == 'GET':
+            
+        render(request, 'login.html', {
+            'form': forms
+        })
+    elif request.method == 'POST':
         form = LoginFoms(request, data=request.post)
         if form.is_valid():
             user_name = form.cleaned_data['username']
@@ -55,28 +65,39 @@ def dashboard(request):
         full_name = user.get_full_name()
         return render(request, 'index.html', {'full_name': full_name})
     else:
-        return HttpResponseRedirect('') #redirigir a login
+        return HttpResponseRedirect('/registro/') #redirigir a login
+
+
 
 #registrarse
 def user_signup(request):
-    if not request.user.is_authenticated:
-        if request.method == 'POST':
-            form = SingUpForm(request.POST)
-            if form.is_valid():
-                form.save()
-                HttpResponseRedirect('/login/') #redirigir a login
-        else:
-            form = SingUpForm()
-        return render(request, 'register.html', {'form': form})
+
+    form = SingUpForm()
+    if request.method == 'GET':
+        return render(request,'register.html', {
+            'form': form
+        })
     else:
-        return HttpResponseRedirect('registro')
+        if request.method == 'POST':
+
+            if request.POST['password1'] == request.POST['password2']:
+                user = User.objects.create_user(
+                    username=request.POST['username'], password=request.POST['password1']
+                )
+                user.save()
+                login(request, user)
+                
+                return render(request, 'register.html', {'form': form, 'exito': '¡El usuario fue creado exitósamente!'})
+            else:
+                return render(request, 'register.html', {'form': form, 'error': 'Las contraseñas no coinciden, verifica e intentalo de nuevo'})
+
+
+
+
+
 
 
 #cerrar cesión
 def user_logout(request):
     logout(request)
     return HttpResponseRedirect('/login/')
-
-
-def registro(request):
-    return render(request, 'register.html')

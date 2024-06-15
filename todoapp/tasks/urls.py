@@ -9,6 +9,8 @@ urlpatterns = [
 
     path('', views.user_login, name='iniciar-sesion'),
     path('registro', views.user_signup, name='registro-usuario'),
+    path('dashboard/', views.dashboard, name = 'dashboard'),
+
 
     path('api/crear/', views.TaskCreate.as_view(), name='crear-tarea'),
     path('api/listar/', views.TaskList.as_view(), name='listar-tarea'),

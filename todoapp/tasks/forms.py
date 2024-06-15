@@ -3,12 +3,13 @@ from django.contrib.auth.forms import (
     UserCreationForm, AuthenticationForm, UsernameField
 )
 from django.contrib.auth.models import User
-
+from django.forms import ModelForm
+from .models import Task
 
 #Registrarse/crear una cuenta
 class SingUpForm(UserCreationForm):
-    password1 = forms.CharField(label='contraseña', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-    password2 = forms.CharField(label='confirmar contraseña', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    password1 = forms.CharField(label='contraseña', widget=forms.PasswordInput(attrs={'class': 'form-floating mb-3'}))
+    password2 = forms.CharField(label='confirmar contraseña', widget=forms.PasswordInput(attrs={'class': 'form-floating mb-3'}))
 
     class Meta:
         model = User #el modelo que voy a usar
@@ -37,3 +38,10 @@ class LoginFoms(AuthenticationForm):
         strip= True, #esto es para quitar los espacios en la contraseñas dijitada por el usuario
         widget=forms.PasswordInput(attrs={"autocompleted":"current-password", "class": "form-control"}) 
     )
+
+
+class TaskForm(ModelForm):
+    
+    class Meta:
+        model = Task
+        fields = ['titulo', 'descripcion', 'terminado']
