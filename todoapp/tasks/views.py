@@ -4,7 +4,7 @@ from rest_framework import generics, permissions
 from .models import Task
 from .serializers import taskSerializer
 from django.contrib.auth.decorators import login_required
-from .forms import LoginFoms, SingUpForm
+from .forms import LoginForms, SingUpForm, TaskForm
 from django.contrib.auth.models import User
 # Create your views here.
 
@@ -36,36 +36,65 @@ class TaskDelete(generics.DestroyAPIView):
 
 
 
-#Iniciar sesion
+
+#Iniciar sesión
 def user_login(request):
-
-    forms = LoginFoms()
-
     if request.method == 'GET':
-            
-        render(request, 'login.html', {
-            'form': forms
-        })
-    elif request.method == 'POST':
-        form = LoginFoms(request, data=request.post)
+        form = LoginForms()
+        return render(request, 'login.html', {"form": form})
+    else:
+        form = LoginForms(request, data=request.POST)
         if form.is_valid():
-            user_name = form.cleaned_data['username']
-            user_pass = form.cleaned_data['password']
-            user = authenticate(username = user_name, password = user_pass)
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return HttpResponseRedirect('/dasboard/')
-    return render(request, 'login.html')
+                return redirect('dashboard')
+            else:
+                return render(request, 'login.html', {"form": form, "error": "El usuario o la contraseña son incorrectos"})
+        else:
+            return render(request, 'login.html', {"form": form, "error": "Por favor, corrija los errores del formulario"})
+    
 
+#Crear una nueva tarea
+@login_required
+def crear_tarea(request):
 
-#pagina principal
-def dashboard(request):
-    if request.user.is_authenticate:
-        user = request.user
-        full_name = user.get_full_name()
-        return render(request, 'index.html', {'full_name': full_name})
+    form = TaskForm()
+
+    if request.method == "GET":
+        return render(request, 'crear-tarea.html', {"form": form})
     else:
-        return HttpResponseRedirect('/registro/') #redirigir a login
+        try:
+            form = TaskForm(request.POST)
+            new_task = form.save(commit=False)
+            new_task.user = request.user
+            new_task.save()
+            return redirect('dashboard')
+        except ValueError:
+            return render(request, 'crear-tarea.html', {"form": form, "error": "Error al crear tarea."})
+
+    
+
+
+
+#Editar tarea
+def editar_tarea(request):
+    return render(request, 'editar-tarea.html')
+
+
+
+#Eliminar tarea
+def eliminar_tarea(request):
+    return render(request, 'editar-tarea.html')
+
+
+@login_required
+def dashboard(request):
+    #tasks = Task.objects.filter(user=request.user)
+    return render(request, 'index.html')
+
 
 
 

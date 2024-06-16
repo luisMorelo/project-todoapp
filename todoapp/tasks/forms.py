@@ -31,7 +31,7 @@ class SingUpForm(UserCreationForm):
         }
 
 #Acceso/inicio de secion 
-class LoginFoms(AuthenticationForm):
+class LoginForms(AuthenticationForm):
     username = UsernameField(widget=forms.TimeInput(attrs={"autofocus": True, "class": "form-control"}))
     password = forms.CharField(
         label= "contraseña",
