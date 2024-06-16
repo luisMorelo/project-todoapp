@@ -90,10 +90,12 @@ def eliminar_tarea(request):
     return render(request, 'editar-tarea.html')
 
 
+#Lusta de tareas y dashboart
 @login_required
 def dashboard(request):
-    #tasks = Task.objects.filter(user=request.user)
-    return render(request, 'index.html')
+    tasks = Task.objects.all()
+    return render(request, 'index.html', { 'tasks': tasks })
+
 
 
 
