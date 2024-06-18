@@ -6,6 +6,7 @@ from .serializers import taskSerializer
 from django.contrib.auth.decorators import login_required
 from .forms import LoginForms, SingUpForm, TaskForm
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 # Create your views here.
 
 class TaskList(generics.ListAPIView):
@@ -77,23 +78,38 @@ def crear_tarea(request):
 
     
 
-
-
 #Editar tarea
-def editar_tarea(request):
-    return render(request, 'editar-tarea.html')
+@login_required
+def editar_tarea(request, task_id):
+    task = get_object_or_404(Task, id=task_id, user=request.user)
+    
+    if request.method == "GET":
+        form = TaskForm(instance=task)
+        return render(request, 'editar-tarea.html', {"form": form, "task": task})
+    else:
+        try:
+            form = TaskForm(request.POST, instance=task)
+            form.save()
+            return redirect('dashboard')
+        except ValueError:
+            return render(request, 'editar-tarea.html', {"form": form, "task": task, "error": "Error al editar tarea."})
 
 
 
 #Eliminar tarea
-def eliminar_tarea(request):
-    return render(request, 'editar-tarea.html')
+def eliminar_tarea(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    if request.method == "POST":
+        task.delete()
+        return redirect('dashboard')  # redirige a la lista de tareas después de eliminar
+
+    return render(request, 'editar-tarea.html', {'task': task})
 
 
-#Lusta de tareas y dashboart
+#Lista de tareas y dashboart
 @login_required
 def dashboard(request):
-    tasks = Task.objects.all()
+    tasks = Task.objects.filter(user=request.user)
     return render(request, 'index.html', { 'tasks': tasks })
 
 
@@ -125,7 +141,8 @@ def user_signup(request):
 
 
 
-
+def vista_acciones(request):
+    return render(request, 'editar-tarea.html')
 
 
 #cerrar cesión
