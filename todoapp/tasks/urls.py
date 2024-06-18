@@ -13,7 +13,7 @@ urlpatterns = [
     path('editar/<int:task_id>/', views.editar_tarea, name='editar-tarea'),
     path('eliminar-task/<int:task_id>/', views.eliminar_tarea, name='eliminar-tarea'),
 
-    path('acciones', views.vista_acciones , name = 'acciones-tarea'),
+    
 
     #path('api/crear/', views.TaskCreate.as_view(), name='crear-task'),
     #path('api/listar/', views.TaskList.as_view(), name='listar-tarea'),

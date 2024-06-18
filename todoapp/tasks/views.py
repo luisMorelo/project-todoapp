@@ -137,15 +137,3 @@ def user_signup(request):
                 return render(request, 'register.html', {'form': form, 'exito': '¡El usuario fue creado exitósamente!'})
             else:
                 return render(request, 'register.html', {'form': form, 'error': 'Las contraseñas no coinciden, verifica e intentalo de nuevo'})
-
-
-
-
-def vista_acciones(request):
-    return render(request, 'editar-tarea.html')
-
-
-#cerrar cesión
-def user_logout(request):
-    logout(request)
-    return HttpResponseRedirect('/login/')
