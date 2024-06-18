@@ -103,7 +103,7 @@ def eliminar_tarea(request, task_id):
         task.delete()
         return redirect('dashboard')  # redirige a la lista de tareas después de eliminar
 
-    return render(request, 'editar-tarea.html', {'task': task})
+    return render(request, 'eliminar-tarea.html', {'task': task})
 
 
 #Lista de tareas y dashboart
